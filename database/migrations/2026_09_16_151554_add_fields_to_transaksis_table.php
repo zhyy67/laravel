@@ -12,13 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('transaksis', function (Blueprint $table) {
-            schema::table('transaksis', function (Blueprint $table) {
-                $table->unsignedBigInteger('barang_id')->after('id');
-                $table->integer('jumlah')->after('barang_id');
-                $table->decimal('total_harga', 12, 2)->after('jumlah');
+            $table->unsignedBigInteger('barang_id')->after('id');
+            $table->integer('jumlah')->after('barang_id');
+            $table->decimal('total_harga', 12, 2)->after('jumlah');
 
-                $table->foreign('barang_id')->references('id')->on('barangs')->onDelete('cascade');
-            });
+            $table->foreign('barang_id')
+                  ->references('id')
+                  ->on('barangs')
+                  ->onDelete('cascade');
         });
     }
 
@@ -26,10 +27,14 @@ return new class extends Migration
      * Reverse the migrations.
      */
     public function down(): void
-    {
-        Schema::table('transaksis', function (Blueprint $table) {
-            $table->dropForeign(['barang_id']);
-            $table->dropColumn(['barang_id', 'jumlah', 'total_harga']);
-        });
-    }
+{
+    Schema::table('transaksis', function (Blueprint $table) {
+        // Menghapus foreign key terlebih dahulu
+        $table->dropForeign(['barang_id']);
+        
+        // Menghapus kolom-kolom yang baru ditambahkan
+        $table->dropColumn(['barang_id', 'jumlah', 'total_harga']);
+    });
+}
+
 };
