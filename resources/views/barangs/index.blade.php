@@ -1,19 +1,23 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Barang</title>
-</head>
+@extends('layouts.app')
 
-<body>
+@section('content')
 
-    <h1>Data Barang</h1>
-    <a href="{{ route('barangs.create') }}">Tambah Barang</a><br><br>
-    <table border="1" cellpadding="10" cellspacing="0">
+<div class="card-container">
+
+    <h1 class="page-title">Data Barang</h1>
+
+    <p class="page-description">
+        Daftar barang yang tersedia di sistem penjualan.
+    </p>
+
+    <a href="{{ route('barangs.create') }}" class="button">
+        ➕ Tambah Barang
+    </a>
+
+    <table>
         <thead>
             <tr>
-                <th>No</th>
+                <th>ID</th>
                 <th>Kode Barang</th>
                 <th>Nama Barang</th>
                 <th>Harga</th>
@@ -23,38 +27,49 @@
         </thead>
 
         <tbody>
-            @forelse ($barangs as $barang)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $barang->kode_barang }}</td>
-                    <td>{{ $barang->nama_barang }}</td>
-                    <td>Rp {{$barang->harga}}</td>
-                    <td>{{ $barang->stok }}</td>
-                    <td>
-                        
-    <a href="{{ route('barangs.edit', $barang->id) }}">Edit</a>
 
-    <form action="{{ route('barangs.destroy', $barang->id) }}" method="POST" style="display:inline;">
-        @csrf
-        @method('DELETE')
-        <button type="submit" onclick="return confirm('Yakin ingin menghapus barang ini?')">
-            Hapus
-        </button>
-    </form>
-</td>
-                       
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="5">Belum ada data barang.</td>
-                </tr>
-            @endforelse
+            @foreach ($barangs as $barang)
+
+            <tr>
+                <td>{{ $barang->id }}</td>
+                <td>{{ $barang->kode_barang }}</td>
+                <td>{{ $barang->nama_barang }}</td>
+                <td>
+                    Rp {{ number_format($barang->harga, 0, ',', '.') }}
+                </td>
+                <td>{{ $barang->stok }}</td>
+
+                <td>
+                    <a href="{{ route('barangs.edit', $barang->id) }}">
+                        ✏️ Edit
+                    </a>
+
+                    <form action="{{ route('barangs.destroy', $barang->id) }}"
+                          method="POST"
+                          style="display:inline;">
+
+                        @csrf
+                        @method('DELETE')
+
+                        <button type="submit"
+                                onclick="return confirm('Yakin ingin menghapus barang ini?')">
+                            🗑️ Hapus
+                        </button>
+
+                    </form>
+                </td>
+            </tr>
+
+            @endforeach
+
         </tbody>
-        <tbody>
-            
     </table>
 
-</body>
-</html>
+    <!-- TOMBOL KEMBALI -->
+    <a href="{{ route('dashboard') }}" class="back-button">
+        ← Kembali ke Dashboard
+    </a>
+
+</div>
+
+@endsection

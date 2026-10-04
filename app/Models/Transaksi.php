@@ -8,12 +8,19 @@ use App\Models\Barang;
 class Transaksi extends Model
 {
     protected $fillable = [
-    'barang_id', 
-    'jumlah', 
-    'total_harga'];
-    
+        'nomer_transaksi',
+        'tanggal',
+        'barang_id',
+        'jumlah',
+        'total_harga',
+    ];
+
+    protected $casts = [
+        'tanggal' => 'datetime',
+    ];
+
     public function barang()
     {
         return $this->belongsTo(Barang::class, 'barang_id');
     }
-}
+};

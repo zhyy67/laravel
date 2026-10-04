@@ -1,32 +1,89 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Tambah Barang</title>
-</head>
-<body>
+@extends('layouts.app')
 
-    <h1>Tambah Barang</h1>
+@section('content')
+
+<div class="card-container">
+
+    <h1 class="page-title">Tambah Barang</h1>
+
+    <p class="page-description">
+        Silakan isi data barang yang ingin ditambahkan.
+    </p>
 
     <form action="{{ route('barangs.store') }}" method="POST">
+
         @csrf
 
-        <label>Kode Barang</label><br>
-        <input type="text" name="kode_barang" maxlength="20"><br><br>
+        <!-- KODE BARANG -->
+        <div class="form-group">
+            <label for="kode_barang">Kode Barang</label>
 
-        <label>Nama Barang</label><br>
-        <input type="text" name="nama_barang" maxlength="100"><br><br>
+            <input
+                type="text"
+                name="kode_barang"
+                id="kode_barang"
+                value="{{ old('kode_barang') }}"
+                placeholder="Contoh: BRG001"
+                required
+            >
+        </div>
 
-        <label>Harga</label><br>
-        <input type="number" name="harga" step="0.01"><br><br>
+        <!-- NAMA BARANG -->
+        <div class="form-group">
+            <label for="nama_barang">Nama Barang</label>
 
-        <label>Stok</label><br>
-        <input type="number" name="stok" min="0"><br><br>
+            <input
+                type="text"
+                name="nama_barang"
+                id="nama_barang"
+                value="{{ old('nama_barang') }}"
+                placeholder="Masukkan nama barang"
+                required
+            >
+        </div>
 
-        <button type="submit">Simpan</button>
+        <!-- HARGA -->
+        <div class="form-group">
+            <label for="harga">Harga</label>
 
-        <a href="{{ route('barangs.index') }}">Kembali</a>
+            <input
+                type="number"
+                name="harga"
+                id="harga"
+                value="{{ old('harga') }}"
+                placeholder="Contoh: 75000"
+                min="0"
+                required
+            >
+        </div>
+
+        <!-- STOK -->
+        <div class="form-group">
+            <label for="stok">Stok</label>
+
+            <input
+                type="number"
+                name="stok"
+                id="stok"
+                value="{{ old('stok') }}"
+                placeholder="Masukkan jumlah stok"
+                min="0"
+                required
+            >
+        </div>
+
+        <!-- SIMPAN -->
+        <button type="submit" class="button">
+            💾 Simpan Barang
+        </button>
+
     </form>
 
-</body>
-</html>
+    <!-- KEMBALI -->
+    <a href="{{ route('barangs.index') }}" class="back-button">
+        ← Kembali ke Barang
+    </a>
+
+</div>
+
+@endsection

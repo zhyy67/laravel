@@ -10,105 +10,77 @@ class TransaksiController extends Controller
 {
     public function index()
     {
-        $transaksi = Transaksi::with('barang')->get();
+        $transaksi = Transaksi::with('barang')
+            ->latest()
+            ->get();
 
-        return view('transaksi.index', compact('transaksi'));
+        return view('transaksis.index', compact('transaksi'));
     }
 
     public function create()
     {
-        $barangs = Barang::all();
+        $barangs = Barang::where('stok', '>', 0)->get();
 
-        return view('transaksi.create', compact('barangs'));
+        return view('transaksis.create', compact('barangs'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'barang_id' => 'required',
+            'barang_id' => 'required|exists:barangs,id',
             'jumlah' => 'required|integer|min:1',
         ]);
 
         $barang = Barang::findOrFail($request->barang_id);
 
+        // Cek stok
         if ($request->jumlah > $barang->stok) {
-            return redirect()->back()->withErrors(['jumlah' => 'Jumlah melebihi stok yang tersedia']);
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors([
+                    'jumlah' => 'Jumlah melebihi stok yang tersedia.'
+                ]);
         }
 
+        // Hitung total harga
         $total = $barang->harga * $request->jumlah;
 
+        // Buat nomor transaksi otomatis
+        $nomerTransaksi = 'TRX-' . date('YmdHis') . '-' . rand(100, 999);
+
+        // Simpan transaksi
         Transaksi::create([
+            'nomer_transaksi' => $nomerTransaksi,
+            'tanggal' => now(),
             'barang_id' => $request->barang_id,
             'jumlah' => $request->jumlah,
             'total_harga' => $total,
         ]);
 
+        // Kurangi stok
         $barang->decrement('stok', $request->jumlah);
-        $barang->save();
 
-        $transaksi->delete();
-
-        return redirect('/transaksis');
+        return redirect()
+            ->route('transaksis.index')
+            ->with('success', 'Transaksi berhasil ditambahkan.');
     }
 
-    
-    
     public function destroy($id)
     {
         $transaksi = Transaksi::findOrFail($id);
-        $barang = Barang::findOrFail($transaksi->barang_id);
 
-        if ($transaksi->jumlah > $barang->stok) {
-            return redirect()->back()->withErrors(['jumlah' => 'Jumlah melebihi stok yang tersedia']);
+        // Kembalikan stok barang
+        $barang = Barang::find($transaksi->barang_id);
+
+        if ($barang) {
+            $barang->increment('stok', $transaksi->jumlah);
         }
-        
-        $barang->increment('stok', $transaksi->jumlah);
-        $barang->save();
 
         $transaksi->delete();
 
-        return redirect('/transaksis')->with('success', 'Transaksi berhasil dihapus');
+        return redirect()
+            ->route('transaksis.index')
+            ->with('success', 'Transaksi berhasil dihapus.');
     }
-
-    public function edit($id)
-    {
-        $transaksi = Transaksi::findOrFail($id);
-        $barangs = Barang::all(); 
-
-        return view('transaksi.edit', compact('transaksi', 'barangs'));
-    }
-
-    public function update(Request $request, $id)
-{
-    $request->validate([
-        'barang_id' => 'required|exists:barangs,id',
-        'jumlah' => 'required|integer|min:1',
-    ]);
-
-    $transaksi = Transaksi::findOrFail($id);
-    $barangLama = Barang::findOrFail($transaksi->barang_id);
-    $barangLama->increment('stok', $transaksi->jumlah);
-    $barangBaru = Barang::findOrFail($request->barang_id);
-    if ($request->jumlah > $barangBaru->stok) {
-
-        $barangLama->decrement('stok', $transaksi->jumlah);
-
-        return back()
-            ->withInput()
-            ->with('error', 'Jumlah melebihi stok yang tersedia!');
-    }
-
-    $total = $barangBaru->harga * $request->jumlah;
-
-    $transaksi->update([
-        'barang_id' => $barangBaru->id,
-        'jumlah' => $request->jumlah,
-        'total_harga' => $total,
-    ]);
-
-    $barangBaru->decrement('stok', $request->jumlah);
-
-    return redirect('/transaksis')
-        ->with('success', 'Transaksi berhasil diperbarui!');
-}
 }

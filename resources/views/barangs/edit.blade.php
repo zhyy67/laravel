@@ -1,41 +1,86 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Barang</title>
-</head>
-<body>
+@extends('layouts.app')
 
-<h1>Edit Barang</h1>
+@section('content')
 
-<form action="{{ route('barangs.update', $barang->id) }}" method="POST">
-    @csrf
-    @method('PUT')
+<div class="card-container">
 
-    <p>
-        Kode Barang:<br>
-        <input type="text" name="kode_barang" value="{{ $barang->kode_barang }}">
+    <h1 class="page-title">Edit Barang</h1>
+
+    <p class="page-description">
+        Ubah data barang yang dipilih.
     </p>
 
-    <p>
-        Nama Barang:<br>
-        <input type="text" name="nama_barang" value="{{ $barang->nama_barang }}">
-    </p>
+    <form action="{{ route('barangs.update', $barang->id) }}" method="POST">
 
-    <p>
-        Harga:<br>
-        <input type="number" name="harga" value="{{ $barang->harga }}">
-    </p>
+        @csrf
+        @method('PUT')
 
-    <p>
-        Stok:<br>
-        <input type="number" name="stok" value="{{ $barang->stok }}">
-    </p>
+        <!-- KODE BARANG -->
+        <div class="form-group">
+            <label for="kode_barang">Kode Barang</label>
 
-    <button type="submit">Update</button>
-    <a href="{{ route('barangs.index') }}">Kembali</a>
+            <input
+                type="text"
+                name="kode_barang"
+                id="kode_barang"
+                value="{{ old('kode_barang', $barang->kode_barang) }}"
+                required
+            >
+        </div>
 
-</form>
+        <!-- NAMA BARANG -->
+        <div class="form-group">
+            <label for="nama_barang">Nama Barang</label>
 
-</body>
-</html>
+            <input
+                type="text"
+                name="nama_barang"
+                id="nama_barang"
+                value="{{ old('nama_barang', $barang->nama_barang) }}"
+                required
+            >
+        </div>
+
+        <!-- HARGA -->
+        <div class="form-group">
+            <label for="harga">Harga</label>
+
+            <input
+                type="number"
+                name="harga"
+                id="harga"
+                value="{{ old('harga', $barang->harga) }}"
+                min="0"
+                required
+            >
+        </div>
+
+        <!-- STOK -->
+        <div class="form-group">
+            <label for="stok">Stok</label>
+
+            <input
+                type="number"
+                name="stok"
+                id="stok"
+                value="{{ old('stok', $barang->stok) }}"
+                min="0"
+                required
+            >
+        </div>
+
+        <!-- SIMPAN PERUBAHAN -->
+        <button type="submit" class="button">
+            💾 Simpan Perubahan
+        </button>
+
+    </form>
+
+    <!-- KEMBALI -->
+    <a href="{{ route('barangs.index') }}" class="back-button">
+        ← Kembali ke Barang
+    </a>
+
+</div>
+
+@endsection
